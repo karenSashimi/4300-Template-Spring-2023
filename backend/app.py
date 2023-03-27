@@ -14,12 +14,12 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..",os.curdir))
 MYSQL_USER = "root"
 MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
-MYSQL_DATABASE = "kardashiandb"
+MYSQL_DATABASE = "project"
 
 mysql_engine = MySQLDatabaseHandler(MYSQL_USER,MYSQL_USER_PASSWORD,MYSQL_PORT,MYSQL_DATABASE)
 
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
-mysql_engine.load_file_into_db()
+mysql_engine.load_file_into_db(file_path='../init.sql')
 
 app = Flask(__name__)
 CORS(app)
@@ -27,9 +27,9 @@ CORS(app)
 # Sample search, the LIKE operator in this case is hard-coded, 
 # but if you decide to use SQLAlchemy ORM framework, 
 # there's a much better and cleaner way to do this
-def sql_search(episode):
-    query_sql = f"""SELECT * FROM episodes WHERE LOWER( title ) LIKE '%%{episode.lower()}%%' limit 10"""
-    keys = ["id","title","descr"]
+def sql_search(professor):
+    query_sql = f"""SELECT professor, review FROM reviews WHERE professor LIKE '%%{professor.lower()}%%'"""
+    keys = ["professor","review"]
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys,i)) for i in data])
 
@@ -42,4 +42,4 @@ def episodes_search():
     text = request.args.get("title")
     return sql_search(text)
 
-# app.run(debug=True)
+app.run(debug=True)
